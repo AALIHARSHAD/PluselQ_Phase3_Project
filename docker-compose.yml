@@ -1,0 +1,54 @@
+services:
+  etl:
+    build: .
+    image: pulseiq-etl:latest
+    env_file:
+      - path: .env
+        required: false
+    environment:
+      RAW_DIR: /app/data/raw
+      CLEAN_DIR: /app/data/clean
+      REJECTED_DIR: /app/data/rejected
+      LOG_DIR: /app/logs
+    volumes:
+      - ./data:/app/data
+      - ./logs:/app/logs
+  test:
+    build: .
+    image: pulseiq-etl:latest
+    entrypoint: ["python", "-m", "pytest", "-q", "/app/tests"]
+    volumes:
+      - ./data:/app/data
+
+  dashboard:
+    build: .
+    image: pulseiq-etl:latest
+    entrypoint:
+      - streamlit
+      - run
+      - /app/dashboards/app.py
+      - --server.address=0.0.0.0
+      - --server.port=8501
+    ports:
+      - "8501:8501"
+    volumes:
+      - ./data:/app/data:ro
+      - ./dashboards:/app/dashboards:ro
+
+  phase3:
+    build: .
+    image: pulseiq-etl:latest
+    environment:
+      DATA_DIR: /app/data
+      PYTHONPATH: /app/src
+    entrypoint:
+      - streamlit
+      - run
+      - /app/dashboards/phase3_app.py
+      - --server.address=0.0.0.0
+      - --server.port=8502
+    ports:
+      - "8502:8502"
+    volumes:
+      - ./data:/app/data
+      - ./dashboards:/app/dashboards:ro

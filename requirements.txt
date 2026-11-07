@@ -1,0 +1,12 @@
+pandas==2.2.3
+pyarrow==17.0.0
+pandera==0.20.4
+python-dotenv==1.0.1
+pytest==8.3.3
+openpyxl>=3.1.5
+duckdb
+
+streamlit>=1.39,<2
+altair>=5,<6
+
+plotly>=5.20

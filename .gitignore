@@ -1,0 +1,9 @@
+.env
+__pycache__/
+*.pyc
+data/clean/*
+data/rejected/*
+logs/*
+!data/clean/.gitkeep
+!data/rejected/.gitkeep
+!logs/.gitkeep

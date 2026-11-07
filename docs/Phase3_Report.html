@@ -1,0 +1,41 @@
+<!doctype html><meta charset="utf-8"><style>
+@page{size:A4;margin:14mm}body{font:9pt/1.3 "Helvetica Neue",Arial,sans-serif;color:#111}
+h1{font-size:17pt;margin:0 0 4px}h2{font-size:11.5pt;margin:12px 0 4px;border-bottom:1px solid #ccc;padding-bottom:2px}
+table{border-collapse:collapse;width:100%;font-size:8pt}td,th{border:1px solid #ccc;padding:3px 6px;vertical-align:top;text-align:left}th{background:#f1f0ed}
+.ok{color:#1a7f37;font-weight:700}.small{font-size:8.5pt;color:#444}.g{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px}.g img{width:100%;border:1px solid #ddd}
+pre{background:#f6f6f4;padding:6px;font-size:8.5pt;margin:4px 0}a{color:#2a78d6}</style>
+<h1>PulseIQ — Phase 3 Report: Money and insight</h1>
+<p><b>Name:</b> Aali Harshad &nbsp; <b>Track:</b> Data Analytics &nbsp; <b>Phase:</b> 3 (Tasks 11–15) &nbsp; <b>Git tag:</b> <code>phase-3</code><br>
+<b>Repository:</b> <a href="https://github.com/AALIHARSHAD/PluselQ_Phase3_Project">https://github.com/AALIHARSHAD/PluselQ_Phase3_Project</a></p>
+<h2>1. Tasks and evidence</h2>
+<table><tr><th>Task</th><th>Done</th><th>Evidence</th></tr>
+<tr><td>11 Profit &amp; loss, expense analytics</td><td class=ok>Yes</td><td>Page “Profit &amp; loss” (Fig. 2). Group accounts excluded. Tie-out: 17 of 18 months equal the README to the paisa; Jun 2026 differs by ₹18,450 = planted DQ-04, explained on the page.</td></tr>
+<tr><td>12 Receivables and cash</td><td class=ok>Yes</td><td>Page “Receivables &amp; cash” (Fig. 3). Buckets 22,133,626 + 3,036,258 + 1,940,982 + 112,283,412 = 139,394,278 = open receivables = README. Open statuses written on page.</td></tr>
+<tr><td>13 Cross-department view</td><td class=ok>Yes</td><td>Page “Department impact” (Fig. 4). 198 department-months × 13 measures match <code>reference_summary_dept_month</code>, 0 mismatches; raw-vs-clean gap explained (DQ-01/02/03).</td></tr>
+<tr><td>14 AI signals</td><td class=ok>Yes</td><td>Page “AI signals” (Fig. 5). Every chart labelled “AI-generated, for human review”; anomalies ranked by money at risk; forecast error table from back-test.</td></tr>
+<tr><td>15 Executive scorecard</td><td class=ok>Yes</td><td>Page “Company health scorecard” (Fig. 1) and <code>task15_scorecard_A4.pdf</code> (one A4 page). 8 KPIs, each from view <code>v_company_month</code>, each with a Details link.</td></tr></table>
+<h2>2. Proof it works</h2>
+<pre>$ PYTHONPATH=src python -m pytest -q
+23 passed, 1 skipped      (17 of them new in tests/test_phase3.py)</pre>
+<table><tr><th>Check</th><th>Mine</th><th>README / reference</th><th>Result</th></tr>
+<tr><td>Revenue, 18 months</td><td>1,260,930,052</td><td>1,260,930,052</td><td class=ok>✔ ties</td></tr>
+<tr><td>Net profit, 18 months</td><td>224,665,137.58</td><td>224,683,587.58</td><td>Δ 18,450 = DQ-04 (Jun 2026), explained</td></tr>
+<tr><td>Open receivables (30 Sep 2026)</td><td>139,394,278</td><td>139,394,278</td><td class=ok>✔ ties</td></tr>
+<tr><td>Bank balance, all 18 month-ends</td><td colspan=2>rebuilt from ledger, max difference ₹0.00</td><td class=ok>✔</td></tr>
+<tr><td>Department × month table</td><td>198 rows</td><td>198 rows</td><td class=ok>✔ 0 mismatches</td></tr>
+<tr><td>My re-run of AI forecast method vs stored Oct 2026</td><td>426.28</td><td>426.3</td><td class=ok>✔ reproduces</td></tr></table>
+<p class=small><b>Forecast error (company headcount, my back-test):</b> MAPE 3.6% at 1 month ahead rising to 6.3% at 6 months; a naive “same as last month” guess is better at every horizon (1.3% → 5.8%); the 80% band caught the actual only 30–41% of the time, so it is too narrow. No stored forecast month has an actual yet (data ends where the forecast starts), so this is my back-test, not the AI team’s own error.</p>
+<h2>3. What I learned</h2>
+<p>[Rewrite in your own words before submitting] Group accounts are headings and must never be added to their children. Profit is not cash: this company is profitable and still has ₹2.71 Cr overdue. Aggregate every source to the same grain first and join after, then re-add the totals. AI numbers need a range, an error figure and a label, and a simple baseline can beat the model. A scorecard needs a written rule for every colour.</p>
+<h2>4. Problems and how I solved them</h2>
+<table><tr><td>Jun 2026 profit did not tie</td><td>Found ₹18,450 on one journal entry (JE-002094). Left in, flagged as DQ-04 instead of deleting to force a match.</td></tr>
+<tr><td>Forecast has no actuals to test against</td><td>Re-ran the documented method from earlier months (back-test) and said so on the page.</td></tr>
+<tr><td>AI page crashed (<code>.flags</code> column clashed with a pandas attribute)</td><td>Renamed to <code>n_flags</code>; page now runs; tests added.</td></tr>
+<tr><td>kpi_targets has no thresholds, and no target for revenue, margin, overdue</td><td>Wrote the amber/red rule in <code>docs/decisions.md</code>; those three use the previous-12-month average and are marked provisional. <b>To confirm with finance.</b></td></tr>
+<tr><td>Scorecard printed on 2 pages</td><td>Print CSS removes sidebar and spacing; verified 1 A4 page.</td></tr></table>
+<h2>5. Plan for Phase 4</h2>
+<p>Package with Docker (<code>docker compose up phase3</code> already works), tag and release, add self-service filters, and keep the tie-out tests running in CI.</p>
+<div style="page-break-before:always"></div><h2>Screenshots</h2>
+<div class=g><div><b>Fig. 1 Scorecard</b><img src="15_scorecard.jpg"></div><div><b>Fig. 2 Profit &amp; loss</b><img src="11_pnl.jpg"></div>
+<div><b>Fig. 3 Receivables &amp; cash</b><img src="12_cash.jpg"></div><div><b>Fig. 4 Department impact</b><img src="13_departments.jpg"></div>
+<div><b>Fig. 5 AI signals</b><img src="14_ai_signals.jpg"></div></div>
